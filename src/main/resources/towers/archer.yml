@@ -1,0 +1,173 @@
+enabled: true
+
+paths:
+  0:
+    cost: 150
+    damage: 1
+    range: 12
+    rate: 19
+
+    arrow_count: 1
+    arrow_speed: 3.0
+    distance_damage: 0
+    bounce_count: 0
+    bounce_radius: 0.0
+  1:
+    1:
+      cost: 90
+      damage: 1
+      range: 12
+      rate: 15
+
+      arrow_count: 1
+      arrow_speed: 4.5
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+    2:
+      cost: 120
+      damage: 1
+      range: 12
+      rate: 9
+
+      arrow_count: 1
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+
+    3:
+      cost: 450
+      damage: 1
+      range: 12
+      rate: 9
+
+      arrow_count: 3
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+    4:
+      cost: 700
+      damage: 1
+      range: 12
+      rate: 6
+
+      arrow_count: 3
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+    5:
+      cost: 6000
+      damage: 1
+      range: 15
+      rate: 1
+
+      arrow_count: 5
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+  2:
+    1:
+      cost: 70
+      damage: 1
+      range: 16
+      rate: 19
+      arrow_count: 1
+      arrow_speed: 3.0
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+    2:
+      cost: 150
+      damage: 1
+      range: 22
+      rate: 19
+      arrow_count: 1
+      arrow_speed: 3.0
+      distance_damage: 1
+      bounce_count: 0
+      bounce_radius: 0.0
+    3:
+      cost: 1000
+      damage: 1
+      range: 22
+      rate: 16
+      arrow_count: 1
+      arrow_speed: 3.0
+      distance_damage: 5
+      bounce_count: 0
+      bounce_radius: 0.0
+    4:
+      cost: 1300
+      damage: 3
+      range: 28
+      rate: 16
+      arrow_count: 1
+      arrow_speed: 3.0
+      distance_damage: 3
+      bounce_count: 0
+      bounce_radius: 0.0
+    5:
+      cost: 8000
+      damage: 5
+      range: 36
+      rate: 14
+      arrow_count: 1
+      arrow_speed: 3.0
+      distance_damage: 10
+      bounce_count: 0
+      bounce_radius: 0.0
+  3:
+    1:
+      cost: 50
+      damage: 1
+      range: 12
+      rate: 19
+      arrow_count: 1
+      arrow_speed: 4.5
+      distance_damage: 0
+      bounce_count: 0
+      bounce_radius: 0.0
+    2:
+      cost: 90
+      damage: 1
+      range: 12
+      rate: 19
+      arrow_count: 1
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 1
+      bounce_radius: 2.0
+    3:
+      cost: 900
+      damage: 1
+      range: 12
+      rate: 19
+      arrow_count: 1
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 3
+      bounce_radius: 2.0
+    4:
+      cost: 1000
+      damage: 1
+      range: 12
+      rate: 19
+      arrow_count: 1
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 5
+      bounce_radius: 4.0
+    5:
+      cost: 10000
+      damage: 3
+      range: 12
+      rate: 15
+      arrow_count: 1
+      arrow_speed: 6.0
+      distance_damage: 0
+      bounce_count: 30
+      bounce_radius: 8.0

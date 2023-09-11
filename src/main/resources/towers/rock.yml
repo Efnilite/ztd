@@ -1,0 +1,199 @@
+enabled: true
+
+paths:
+  0:
+    cost: 1000
+    damage: 3
+    range: 7
+    rate: 20
+
+    slow: 0
+    knockback: 0
+    block_count: 1
+    fall_count: 1
+    fall_radius: 0.0
+    material: "stone"
+  1:
+    1:
+      cost: 800
+      damage: 3
+      range: 12
+      rate: 20
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    2:
+      cost: 800
+      damage: 5
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    3:
+      cost: 900
+      damage: 5
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 1
+      block_count: 1
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    4:
+      cost: 1700
+      damage: 5
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 2
+      block_count: 1
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    5:
+      cost: 8000
+      damage: 8
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 3
+      block_count: 1
+      fall_count: 20
+      fall_radius: 1.5
+      material: "stone"
+  2:
+    1:
+      cost: 120
+      damage: 3
+      range: 7
+      rate: 15
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    2:
+      cost: 1200
+      damage: 3
+      range: 7
+      rate: 15
+
+      slow: 0
+      knockback: 0
+      block_count: 2
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    3:
+      cost: 2100
+      damage: 3
+      range: 7
+      rate: 15
+
+      slow: 0
+      knockback: 0
+      block_count: 3
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    4:
+      cost: 4000
+      damage: 3
+      range: 7
+      rate: 8
+
+      slow: 1
+      knockback: 0
+      block_count: 3
+      fall_count: 1
+      fall_radius: 0.0
+      material: "ice"
+    5:
+      cost: 7000
+      damage: 3
+      range: 7
+      rate: 8
+
+      slow: 2
+      knockback: 0
+      block_count: 5
+      fall_count: 1
+      fall_radius: 0.0
+      material: "blue_ice"
+
+  3:
+    1:
+      cost: 500
+      damage: 5
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 1
+      fall_radius: 0.0
+      material: "stone"
+    2:
+      cost: 800
+      damage: 5
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 5
+      fall_radius: 0.5
+      material: "stone"
+    3:
+      cost: 1500
+      damage: 7
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 5
+      fall_radius: 0.5
+      material: "stone"
+    4:
+      cost: 1900
+      damage: 8
+      range: 7
+      rate: 20
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 10
+      fall_radius: 0.5
+      material: "pointed_dripstone[vertical_direction=down]"
+    5:
+      cost: 6000
+      damage: 10
+      range: 7
+      rate: 10
+
+      slow: 0
+      knockback: 0
+      block_count: 1
+      fall_count: 15
+      fall_radius: 0.5
+      material: "pointed_dripstone[vertical_direction=down]"

@@ -1,0 +1,134 @@
+enabled: true
+
+paths:
+  0:
+    cost: 250
+    damage: 0
+    range: 4
+    rate: 30
+
+    freeze_time: 15
+    target_count: 10
+  1:
+    1:
+      cost: 120
+      damage: 0
+      range: 6
+      rate: 30
+
+      freeze_time: 15
+      target_count: 15
+    2:
+      cost: 180
+      damage: 0
+      range: 8
+      rate: 30
+
+      freeze_time: 15
+      target_count: 20
+    3:
+      cost: 250
+      damage: 0
+      range: 8
+      rate: 30
+
+      freeze_time: 20
+      target_count: 20
+    4:
+      cost: 600
+      damage: 0
+      range: 8
+      rate: 20
+
+      freeze_time: 20
+      target_count: 20
+    5:
+      cost: 6000
+      damage: 1
+      range: 10
+      rate: 15
+
+      freeze_time: 1000
+      target_count: 40
+  2:
+    1:
+      cost: 120
+      damage: 0
+      range: 6
+      rate: 30
+
+      freeze_time: 15
+      target_count: 15
+    2:
+      cost: 180
+      damage: 0
+      range: 8
+      rate: 30
+
+      freeze_time: 15
+      target_count: 20
+    3:
+      cost: 250
+      damage: 0
+      range: 8
+      rate: 30
+
+      freeze_time: 20
+      target_count: 20
+    4:
+      cost: 600
+      damage: 0
+      range: 8
+      rate: 20
+
+      freeze_time: 20
+      target_count: 20
+    5:
+      cost: 6000
+      damage: 1
+      range: 10
+      rate: 15
+
+      freeze_time: 1000
+      target_count: 40
+  3:
+    1:
+      cost: 120
+      damage: 0
+      range: 6
+      rate: 30
+
+      freeze_time: 15
+      target_count: 15
+    2:
+      cost: 180
+      damage: 0
+      range: 8
+      rate: 30
+
+      freeze_time: 15
+      target_count: 20
+    3:
+      cost: 250
+      damage: 0
+      range: 8
+      rate: 30
+
+      freeze_time: 20
+      target_count: 20
+    4:
+      cost: 600
+      damage: 0
+      range: 8
+      rate: 20
+
+      freeze_time: 20
+      target_count: 20
+    5:
+      cost: 6000
+      damage: 1
+      range: 10
+      rate: 15
+
+      freeze_time: 1000
+      target_count: 40

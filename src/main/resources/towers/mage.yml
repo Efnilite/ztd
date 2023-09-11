@@ -1,0 +1,140 @@
+enabled: true
+
+paths:
+  0:
+    cost: 350
+    damage: 1
+    range: 10
+    rate: 35
+
+    fire_length: 60
+    damage_bonus: 0
+    target_count: 5
+  1:
+    1:
+      cost: 200
+      damage: 1
+      range: 10
+      rate: 35
+
+      fire_length: 100
+      damage_bonus: 0
+      target_count: 5
+    2:
+      cost: 400
+      damage: 1
+      range: 10
+      rate: 35
+
+      fire_length: 200
+      damage_bonus: 0
+      target_count: 5
+    3:
+      cost: 750
+      damage: 1
+      range: 10
+      rate: 35
+
+      fire_length: 200
+      damage_bonus: 1
+      target_count: 8
+    4:
+      cost: 1000
+      damage: 1
+      range: 10
+      rate: 35
+
+      fire_length: 300
+      damage_bonus: 1
+      target_count: 8
+    5:
+      cost: 7000
+      damage: 5
+      range: 10
+      rate: 35
+
+      fire_length: 800
+      damage_bonus: 3
+      target_count: 8
+  2:
+    1:
+      cost: 100
+      damage: 1
+      range: 10
+      rate: 28
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 5
+    2:
+      cost: 400
+      damage: 1
+      range: 14
+      rate: 14
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 5
+    3:
+      cost: 1000
+      damage: 3
+      range: 14
+      rate: 14
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 5
+    4:
+      cost: 1000
+      damage: 4
+      range: 14
+      rate: 14
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 8
+    5:
+      cost: 8000
+      damage: 7
+      range: 29
+      rate: 4
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 8
+  3:
+    1:
+      cost: 200
+      damage: 1
+      range: 10
+      rate: 35
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 7
+    2:
+      cost: 350
+      damage: 1
+      range: 10
+      rate: 35
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 10
+    3:
+      cost: 600
+      damage: 1
+      range: 10
+      rate: 35
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 18
+    4:
+      cost: 2000
+      damage: 3
+      range: 10
+      rate: 35
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 60
+    5:
+      cost: 6000
+      damage: 5
+      range: 10
+      rate: 20
+      fire_length: 60
+      damage_bonus: 0
+      target_count: 200
