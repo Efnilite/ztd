@@ -3,7 +3,6 @@ package dev.efnilite.ztd.event
 import dev.efnilite.vilib.event.EventWatcher
 import dev.efnilite.ztd.TowerPlayer.Companion.asTowerPlayer
 import dev.efnilite.ztd.TowerPlayer.Companion.isTowerPlayer
-import dev.efnilite.ztd.ZTD
 import dev.efnilite.ztd.menu.PlaceMenu
 import dev.efnilite.ztd.menu.TowerMenu
 import dev.efnilite.ztd.tower.Tower
@@ -12,6 +11,7 @@ import dev.efnilite.ztd.tower.projectile.FallingBlockProjectile
 import dev.efnilite.ztd.tower.projectile.Projectile
 import dev.efnilite.ztd.tower.util.TowerUtil
 import dev.efnilite.ztd.tower.util.TroopList
+import dev.efnilite.ztd.world.ZWorld
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
@@ -33,7 +33,7 @@ object Events : EventWatcher {
 
     @EventHandler
     fun spawn(event: CreatureSpawnEvent) {
-        if (event.entity.world.uid != ZTD.world.uid) {
+        if (event.entity.world.uid != ZWorld.world.uid) {
             return
         }
 
@@ -71,7 +71,7 @@ object Events : EventWatcher {
     }
 
     private fun handleRockDrop(entity: Entity, event: Cancellable) {
-        if (entity.world.uid != ZTD.world.uid || entity.type != EntityType.FALLING_BLOCK) {
+        if (entity.world.uid != ZWorld.world.uid || entity.type != EntityType.FALLING_BLOCK) {
             return
         }
 
@@ -110,7 +110,7 @@ object Events : EventWatcher {
 
     @EventHandler
     fun drop(event: PlayerDropItemEvent) {
-        if (event.player.world.uid != ZTD.world.uid) {
+        if (event.player.world.uid != ZWorld.world.uid) {
             return
         }
 
@@ -119,7 +119,7 @@ object Events : EventWatcher {
 
     @EventHandler
     fun drop(event: BlockDropItemEvent) {
-        if (event.block.world.uid != ZTD.world.uid) {
+        if (event.block.world.uid != ZWorld.world.uid) {
             return
         }
 
@@ -128,7 +128,7 @@ object Events : EventWatcher {
 
     @EventHandler
     fun damage(event: EntityDamageEvent) {
-        if (event.entity.world.uid != ZTD.world.uid) {
+        if (event.entity.world.uid != ZWorld.world.uid) {
             return
         }
 
@@ -139,7 +139,7 @@ object Events : EventWatcher {
     fun projectileHit(event: ProjectileHitEvent) {
         val entity = event.entity
 
-        if (entity.world.uid != ZTD.world.uid) {
+        if (entity.world.uid != ZWorld.world.uid) {
             return
         }
 

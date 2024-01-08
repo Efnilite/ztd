@@ -19,7 +19,7 @@ object TowerUtil {
             .toVector(), speed.toFloat(), 0.0F)
 
 //        troop.targetedCount++
-        arrow.setMetadata("ztd", FixedMetadataValue(ZTD, projectile))
+        arrow.setMetadata("ztd", FixedMetadataValue(ZTD.instance, projectile))
         arrow.isSilent = true
     }
 

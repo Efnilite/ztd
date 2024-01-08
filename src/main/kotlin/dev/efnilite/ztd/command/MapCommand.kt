@@ -56,7 +56,7 @@ object MapCommand : ViCommand() {
                 val container = ids[args[1].lowercase()]!!
 
                 try {
-                    BukkitObjectOutputStream(BufferedOutputStream(FileOutputStream(ZTD.getInFolder("maps/$map.map")))).use { writer ->
+                    BukkitObjectOutputStream(BufferedOutputStream(FileOutputStream(ZTD.instance.getInFolder("maps/$map.map")))).use { writer ->
                         writer.writeObject(container.path)
                         writer.writeObject(container.spawns)
                         writer.flush()
@@ -72,7 +72,7 @@ object MapCommand : ViCommand() {
                 val container = ids[map]!!
                 val existing = container.path.toMutableList()
 
-                existing.add(player.location.toBlockLocation().subtract(container.min!!).toVector())
+                existing.add(player.location.toBlockLocation().subtract(container.min).toVector())
 
                 ids[map] = MapContainer(container.name, existing, container.spawns, container.min)
 
@@ -107,10 +107,10 @@ object MapCommand : ViCommand() {
                 val world = player.world
 
                 Schematic.create().save(
-                    "${ZTD.dataFolder}/schematics/${UUID.randomUUID()}.schematic",
+                    "${ZTD.instance.dataFolder}/schematics/${UUID.randomUUID()}.schematic",
                     vector1.toLocation(world),
                     vector2.toLocation(world),
-                    ZTD
+                    ZTD.instance
                 )
             }
         }
@@ -126,15 +126,15 @@ object MapCommand : ViCommand() {
             val world: World = player.world
 
             Schematic.create().save(
-                "${ZTD.dataFolder}/maps/$map.schematic",
+                "${ZTD.instance.dataFolder}/maps/$map.schematic",
                 vector1.toLocation(world),
                 vector2.toLocation(world),
-                ZTD
+                ZTD.instance
             )
 
             player.sendMessage("Saving schematic from $vector1 to $vector2")
 
-            Cuboid.getAsync(vector1.toLocation(world), vector2.toLocation(world), true, ZTD) { blocks ->
+            Cuboid.getAsync(vector1.toLocation(world), vector2.toLocation(world), true, ZTD.instance) { blocks ->
                 ids[map] = MapContainer(container.name, container.path, container.spawns, blocks
                     .map(Block::getLocation)
                     .reduce { pos1: Location, pos2: Location -> Locations.min(pos1, pos2) })

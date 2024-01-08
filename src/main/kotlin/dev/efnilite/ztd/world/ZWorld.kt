@@ -10,15 +10,15 @@ import java.io.IOException
 /**
  * Class for handling Parkour world generation/deletion, etc.
  */
-class WorldHandler {
+object ZWorld {
 
-    val world = create()
+    lateinit var world: World
 
     /**
      * Creates the world.
      */
-    private fun create(): World {
-        val world = WorldCreator("ztd")
+    fun create() {
+        world = WorldCreator("ztd")
             .generator("minecraft:air")
             .generateStructures(false)
             .biomeProvider("minecraft:plains")
@@ -27,8 +27,6 @@ class WorldHandler {
             .createWorld()!!
 
         setup()
-
-        return world
     }
 
     /**
@@ -67,7 +65,7 @@ class WorldHandler {
         try {
             FileUtils.deleteDirectory(file)
         } catch (ex: IOException) {
-            ZTD.logging.stack("Error while trying to reset ztd world", ex)
+            ZTD.instance.logging.stack("Error while trying to reset ztd world", ex)
         }
     }
 }

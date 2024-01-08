@@ -1,6 +1,5 @@
 package dev.efnilite.ztd.world
 
-import dev.efnilite.ztd.ZTD
 import dev.efnilite.ztd.session.Session
 import org.bukkit.Location
 import org.jetbrains.annotations.Contract
@@ -46,7 +45,7 @@ object Divider {
         val y = 150.0
         val z = head.second
 
-        return Location(ZTD.world, x * 10000.0, y, z * 10000.0)
+        return Location(ZWorld.world, x * 10000.0, y, z * 10000.0)
     }
 
     /**

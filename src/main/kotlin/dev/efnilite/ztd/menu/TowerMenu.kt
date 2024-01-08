@@ -4,13 +4,19 @@ import dev.efnilite.vilib.inventory.Menu
 import dev.efnilite.vilib.inventory.animation.RandomAnimation
 import dev.efnilite.vilib.inventory.item.Item
 import dev.efnilite.vilib.inventory.item.SliderItem
+import dev.efnilite.ztd.TowerPlayer
 import dev.efnilite.ztd.tower.TargetMode
 import dev.efnilite.ztd.tower.Tower
 import org.bukkit.Material
 
+private data class LevelData(val material: Material, val main: String, val accent: String)
+
+private fun String.beautify(): String = replace("_", " ")
+    .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+
 object TowerMenu {
 
-    fun open(player: dev.efnilite.ztd.TowerPlayer, tower: Tower) {
+    fun open(player: TowerPlayer, tower: Tower) {
         val menu: Menu = Menu(6, "<white>${tower.javaClass.simpleName}")
             .item(49, Item(Material.BARREL, "<#3BB8E7><bold>${tower.damageInflicted}")
                 .lore("<gray>Damage inflicted by this tower."))
@@ -42,6 +48,16 @@ object TowerMenu {
             .item(52, Item(Material.ARROW, "<#F1A0A0><bold>Close")
                 .click({ event -> event.player.closeInventory() }))
 
+        showPaths(tower, player, menu)
+            .distributeRowsEvenly()
+            .fillBackground(Material.GRAY_STAINED_GLASS_PANE)
+            .animation(RandomAnimation())
+            .open(player.player)
+
+        tower.showRange()
+    }
+
+    private fun showPaths(tower: Tower, player: TowerPlayer, menu: Menu): Menu {
         val currentRange = tower.getShootingRange()
         val currentDamage = tower.getDamage()
         val currentRate = tower.getShootingRate()
@@ -78,25 +94,9 @@ object TowerMenu {
                     "",
                     "${data.main}<bold>Stats",
                     "<dark_gray>• ${data.accent}Cost <gray>$cost",
-                    "<dark_gray>• ${data.accent}Range <gray>$range ${
-                        getStatChange(
-                            currentRange,
-                            range
-                        )
-                    }",
-                    "<dark_gray>• ${data.accent}Damage <gray>$damage ${
-                        getStatChange(
-                            currentDamage,
-                            damage
-                        )
-                    }",
-                    "<dark_gray>• ${data.accent}Rate <gray>$rate ${
-                        getStatChange(
-                            currentRate,
-                            rate,
-                            -1
-                        )
-                    }"))
+                    "<dark_gray>• ${data.accent}Range <gray>$range ${getStatChange(currentRange, range)}",
+                    "<dark_gray>• ${data.accent}Damage <gray>$damage ${getStatChange(currentDamage, damage)}",
+                    "<dark_gray>• ${data.accent}Rate <gray>$rate ${getStatChange(currentRate, rate, -1)}"))
 
                 val values = tower.getSpecialValues(path, level)
                 if (values.isNotEmpty()) {
@@ -134,24 +134,14 @@ object TowerMenu {
             }
         }
 
-        menu.distributeRowsEvenly()
-            .fillBackground(Material.GRAY_STAINED_GLASS_PANE)
-            .animation(RandomAnimation())
-            .open(player.player)
-
-        tower.showRange()
+        return menu
     }
 
-    data class LevelData(val material: Material, val main: String, val accent: String)
-
     private fun getStatChange(current: Number, new: Number, positive: Int = 1): String {
-        return when {
-            new.toDouble().compareTo(current.toDouble()) == positive -> "<#48D625>($current ⇒ $new)"
-            new.toDouble().compareTo(current.toDouble()) == -positive -> "<#F22C2C>($current ⇒ $new)"
+        return when (new.toDouble().compareTo(current.toDouble())) {
+            positive -> "<#48D625>($current ⇒ $new)"
+            -positive -> "<#F22C2C>($current ⇒ $new)"
             else -> ""
         }
     }
-
-    private fun String.beautify(): String = replace("_", " ")
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 }

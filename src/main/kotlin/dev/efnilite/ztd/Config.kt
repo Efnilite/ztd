@@ -29,26 +29,20 @@ enum class Config(
     /**
      * The [FileConfiguration] instance associated with this config file.
      */
-    private lateinit var fileConfiguration: FileConfiguration
+    private val fileConfiguration: FileConfiguration
 
     /**
      * The path to this file, incl. plugin folder.
      */
-    private val path: File = ZTD.getInFolder(fileName)
+    private val path: File = ZTD.instance.getInFolder(fileName)
 
     init {
         if (!path.exists()) {
             ZTD.instance.saveResource(fileName, false)
-            ZTD.logging.info("Created config file $fileName")
+            ZTD.instance.logging.info("Created config file $fileName")
         }
-        update()
-        load()
-    }
 
-    /**
-     * Loads the file from disk.
-     */
-    fun load() {
+        update()
         fileConfiguration = YamlConfiguration.loadConfiguration(path)
     }
 
@@ -59,7 +53,7 @@ enum class Config(
         try {
             ConfigUpdater.update(ZTD.instance, fileName, path, ignoredSections)
         } catch (ex: Exception) {
-            ZTD.logging.stack("Error while trying to update config file", ex)
+            ZTD.instance.logging.stack("Error while trying to update config file", ex)
         }
     }
 
@@ -157,16 +151,5 @@ enum class Config(
     // checks if the specified path exists to avoid developer error
     private fun check(path: String) {
         if (!isPath(path)) throw NoSuchElementException("Unknown path $path in $fileName")
-    }
-
-    companion object {
-        /**
-         * Reloads all config files.
-         */
-        fun reload() {
-            values().forEach(Config::load)
-
-            ZTD.logging.info("Loaded all config files")
-        }
     }
 }

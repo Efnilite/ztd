@@ -108,7 +108,7 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
     open fun construct() {
         destroyBlocks()
 
-        val schematic = Schematics.getSchematic(ZTD, "${getName()}-$level.schematic")
+        val schematic = Schematics.getSchematic(ZTD.instance, "${getName()}-$level.schematic")
         schematic.paste(center.clone().subtract(1.0, 0.0, 1.0))
     }
 

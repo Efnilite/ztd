@@ -1,24 +1,28 @@
 package dev.efnilite.ztd
 
 import dev.efnilite.vilib.ViPlugin
+import dev.efnilite.vilib.inventory.Menu
 import dev.efnilite.vilib.schematic.Schematics
 import dev.efnilite.vilib.util.Logging
 import dev.efnilite.vilib.util.elevator.GitElevator
 import dev.efnilite.ztd.command.MapCommand
 import dev.efnilite.ztd.command.ZTDCommand
 import dev.efnilite.ztd.event.Events
-import dev.efnilite.ztd.world.WorldHandler
+import dev.efnilite.ztd.world.ZWorld
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.name
 
-object ZTD : ViPlugin() {
+class ZTD : ViPlugin() {
 
     val logging = Logging(this)
-    private val handler = WorldHandler()
-    val world = handler.world
 
     override fun enable() {
+        instance = this
+
+        Menu.init(this)
+        ZWorld.create()
+
         saveResource("maps/training.map", false)
         saveResource("maps/training.schematic", false)
 
@@ -46,11 +50,15 @@ object ZTD : ViPlugin() {
     }
 
     override fun disable() {
-        handler.world.players.forEach { player -> player.kick() }
-        handler.delete()
+        ZWorld.world.players.forEach { player -> player.kick() }
+        ZWorld.delete()
     }
 
     override fun getElevator(): GitElevator? = null
 
     fun getInFolder(file: String) = File(dataFolder, file)
+
+    companion object {
+        lateinit var instance: ZTD
+    }
 }

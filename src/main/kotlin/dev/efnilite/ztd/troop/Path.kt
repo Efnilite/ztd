@@ -1,6 +1,5 @@
 package dev.efnilite.ztd.troop
 
-import dev.efnilite.ztd.session.Team
 import org.bukkit.Location
 import org.bukkit.util.Vector
 import java.util.*
@@ -29,7 +28,7 @@ class Path(pos: List<Location>) {
             }
 
             // reached final point
-            val opposite = Team.getOpposite(troop.owner.team)
+            val opposite = troop.owner.team.getOpposite()
             troop.session.damageTeam(opposite, TroopType.getHealthFromTroop(troop.type))
             troop.entity.remove()
 

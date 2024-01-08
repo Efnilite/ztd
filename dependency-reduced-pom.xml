@@ -4,7 +4,7 @@
   <groupId>dev.efnilite</groupId>
   <artifactId>ztd</artifactId>
   <name>ztd</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <build>
     <sourceDirectory>src/main/kotlin</sourceDirectory>
     <testSourceDirectory>src/test/kotlin</testSourceDirectory>
@@ -182,19 +182,7 @@
           <groupId>org.apache.maven</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>adventure-api</artifactId>
-          <groupId>net.kyori</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>adventure-text-minimessage</artifactId>
-          <groupId>net.kyori</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>adventure-text-serializer-gson</artifactId>
-          <groupId>net.kyori</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>adventure-text-serializer-legacy</artifactId>
           <groupId>net.kyori</groupId>
         </exclusion>
         <exclusion>
@@ -218,12 +206,6 @@
           <groupId>org.ow2.asm</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.github.Efnilite</groupId>
-      <artifactId>vilib</artifactId>
-      <version>9feca0716d</version>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
   <properties>

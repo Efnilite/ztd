@@ -7,9 +7,13 @@ data class TroopList(val troops: List<Troop2>) : Iterable<Troop2> {
 
     fun isEmpty() = troops.isEmpty()
 
-    fun get(idx: Int) =
-        if (idx < troops.size) troops[idx]
-        else troops[ThreadLocalRandom.current().nextInt(troops.size)]
+    fun get(idx: Int): Troop2 {
+        return if (idx < troops.size) {
+            troops[idx]
+        } else {
+            troops[ThreadLocalRandom.current().nextInt(troops.size)]
+        }
+    }
 
     override fun iterator(): Iterator<Troop2> = troops.iterator()
 }

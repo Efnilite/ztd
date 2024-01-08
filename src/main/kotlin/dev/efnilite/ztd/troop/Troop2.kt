@@ -1,25 +1,39 @@
 package dev.efnilite.ztd.troop
 
 import dev.efnilite.ztd.TowerPlayer
-import dev.efnilite.ztd.ZTD
 import dev.efnilite.ztd.session.Session
 import dev.efnilite.ztd.tower.Mage
 import dev.efnilite.ztd.tower.Tower
+import dev.efnilite.ztd.world.ZWorld
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.LivingEntity
+import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.*
 import kotlin.math.max
 
+private data class PersistentTroopData(
+    val location: Location,
+    val fireTicks: Int = 0,
+    val activePotionEffects: Collection<PotionEffect> = emptySet()
+)
+
 /**
  * Represents any troop. Iteration 2.
  */
-class Troop2(val type: TroopType, val path: Path, val owner: TowerPlayer, data: PersistentTroopData = PersistentTroopData(path.getTarget())) {
+class Troop2 private constructor(
+    val type: TroopType,
+    val path: Path,
+    val owner: TowerPlayer,
+    data: PersistentTroopData
+) {
+
+    constructor(type: TroopType, path: Path, owner: TowerPlayer) : this(type, path, owner, PersistentTroopData(path.getTarget()))
 
     var health = type.health
-    val entity: LivingEntity = ZTD.world.spawnEntity(data.location, type.type) as LivingEntity
+    val entity: LivingEntity = ZWorld.world.spawnEntity(data.location, type.type) as LivingEntity
 
     val world: World
         get() = entity.world
@@ -75,7 +89,7 @@ class Troop2(val type: TroopType, val path: Path, val owner: TowerPlayer, data: 
             val next = TroopType.getNext(newType)
 
             var totalSpawned = 0
-            for ((amount, type) in next.onDeath.invoke()) {
+            for ((type, amount) in next.onDeath.invoke()) {
                 totalSpawned += amount
                 repeat(amount) {
                     Troop2(

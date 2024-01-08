@@ -45,7 +45,7 @@ class Rock(center: Location, blocks: Set<Block>, owner: dev.efnilite.ztd.TowerPl
 
             val fallingBlock = target.world.spawnFallingBlock(target.getCenter().add(0.0, 4.0, 0.0), data)
             fallingBlock.setMetadata("ztd", FixedMetadataValue(
-                ZTD, FallingBlockProjectile(
+                ZTD.instance, FallingBlockProjectile(
                     target, this, 1.0, getDamage(),
                     fallCount = fallCount,
                     fallRadius = fallRadius,

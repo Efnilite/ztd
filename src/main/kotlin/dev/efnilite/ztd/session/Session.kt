@@ -12,6 +12,7 @@ import dev.efnilite.ztd.tower.util.TroopList
 import dev.efnilite.ztd.troop.Troop2
 import dev.efnilite.ztd.troop.TroopType
 import dev.efnilite.ztd.world.Divider
+import dev.efnilite.ztd.world.ZWorld
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -35,10 +36,8 @@ class Session {
 
     private var tick: Int = 0
 
-    private var path: List<Location> = ArrayList()
+    private var path: List<Location> = emptyList()
     private var spawns: Map<Team, Location> = EnumMap(Team::class.java)
-
-    private val mapData: MapData = MapData()
 
     private var sendQueueInterval: Map<TroopType, Int> = EnumMap(TroopType::class.java)
     private var sendQueueCounts: MutableMap<TroopType, Int> = EnumMap(TroopType::class.java)
@@ -99,7 +98,7 @@ class Session {
             return
         }
 
-        ZTD.logging.info("Handling join of player, player = ${pl.name}")
+        ZTD.instance.logging.info("Handling join of player, player = ${pl.name}")
 
         val player = TowerPlayer(pl)
         players[player.uuid] = player
@@ -107,18 +106,18 @@ class Session {
         // show player to other players in game
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer()) {
-                op.showPlayer(ZTD, pl)
+                op.showPlayer(ZTD.instance, pl)
             } else {
-                op.hidePlayer(ZTD, pl)
+                op.hidePlayer(ZTD.instance, pl)
             }
         }
 
         // show other players to player in game
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer()) {
-                pl.showPlayer(ZTD, op)
+                pl.showPlayer(ZTD.instance, op)
             } else {
-                pl.hidePlayer(ZTD, op)
+                pl.hidePlayer(ZTD.instance, op)
             }
         }
 
@@ -138,30 +137,28 @@ class Session {
     }
 
     fun leave(player: TowerPlayer) {
-        ZTD.logging.info("Handling leave of player, player = ${player.name}")
+        ZTD.instance.logging.info("Handling leave of player, player = ${player.name}")
 
         // avoid double leave handling
         if (!players.containsValue(player)) {
             return
         }
 
-        val pl: Player = player.player
-
         // show player who left to all other players who aren't in game
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer()) {
-                op.hidePlayer(ZTD, pl)
+                op.hidePlayer(ZTD.instance, player.player)
             } else {
-                op.showPlayer(ZTD, pl)
+                op.showPlayer(ZTD.instance, player.player)
             }
         }
 
         // show all other players who aren't in game to player
         for (op in Bukkit.getOnlinePlayers()) {
-            if (op.isTowerPlayer() && op != pl) {
-                pl.hidePlayer(ZTD, op)
+            if (op.isTowerPlayer() && op != player.player) {
+                player.player.hidePlayer(ZTD.instance, op)
             } else {
-                pl.showPlayer(ZTD, op)
+                player.player.showPlayer(ZTD.instance, op)
             }
         }
 
@@ -188,71 +185,70 @@ class Session {
 
     fun construct(map: String, onComplete: Runnable) {
         Divider.add(this)
-        mapData.name = map
-        mapData.schematic = Schematics.getSchematic(ZTD, "$map.schematic")
 
-        ZTD.logging.info("Constructing game map, map = $map")
+        val schematic = Schematics.getSchematic(ZTD.instance, "$map.schematic")
+
+        ZTD.instance.logging.info("Constructing game map, map = $map")
 
         // offset center by half the dimensions of the schematic to
         // paste the schematic in the center.
         val center = Divider.toLocation(this)
-        val minSchematic: Location = center.clone().subtract(mapData.schematic.dimensions.multiply(0.5))
+        val minSchematic = center.clone().subtract(schematic.dimensions.multiply(0.5))
 
-        ZTD.logging.info("Pasting game map schematic, map = $map")
-        mapData.schematic.paste(minSchematic)
+        ZTD.instance.logging.info("Pasting game map schematic, map = $map")
+        schematic.paste(minSchematic)
 
-        val dimensions = mapData.schematic.dimensions
-        val halfDimensions = dimensions.clone().multiply(0.75)
+        val halfDimensions: Vector = schematic.dimensions.clone().multiply(0.75)
         val minMap: Location = center.clone().subtract(halfDimensions)
         val maxMap: Location = center.clone().add(halfDimensions)
+
         allowedArea = BoundingBox.of(minMap, maxMap)
-        println("${minMap.toVector()} / ${maxMap.toVector()}")
 
         // todo cache
-        Task.create(ZTD)
+        Task.create(ZTD.instance)
             .async()
             .execute {
                 // map data handling
-                ZTD.logging.info("Reading game map data, map = $map")
+                ZTD.instance.logging.info("Reading game map data, map = $map")
 
-                BukkitObjectInputStream(BufferedInputStream(FileInputStream(ZTD.getInFolder("maps/$map.map")))).use { stream ->
-                    mapData.path = stream.readObject() as MutableList<Vector>
-                    mapData.spawns = stream.readObject() as MutableMap<Team, Vector>
+                BukkitObjectInputStream(BufferedInputStream(FileInputStream(ZTD.instance.getInFolder("maps/$map.map")))).use { stream ->
+                    ZTD.instance.logging.info("Deserializing map data, map = $map")
+
+                    path = (stream.readObject() as MutableList<Vector>)
+                        .map { vector ->
+                            vector.clone().toLocation(ZWorld.world)
+                                .add(minSchematic)
+                                .add(0.5, 0.0, 0.5)
+                        }
+                        .toList()
+
+                    spawns = (stream.readObject() as MutableMap<Team, Vector>)
+                        .map { (team, vector) ->
+                            team to vector.clone().toLocation(ZWorld.world)
+                                .add(minSchematic)
+                                .add(0.5, 0.0, 0.5)
+                        }
+                        .toMap()
                 }
 
-                ZTD.logging.info("Deserializing map data, map = $map")
-                path = mapData.path
-                    .map { vector -> vector.clone().toLocation(ZTD.world)
-                        .add(minSchematic)
-                        .add(0.5, 0.0, 0.5) }
-                    .toMutableList()
-                spawns = mapData.spawns
-                    .map { (team, vector) -> team to vector.clone().toLocation(ZTD.world)
-                        .add(minSchematic)
-                        .add(0.5, 0.0, 0.5) }
-                    .toMap()
-
                 // go to main thread
-                Task.create(ZTD).execute { onComplete.run() }.run()
+                Task.create(ZTD.instance).execute { onComplete.run() }.run()
             }
             .run()
     }
 
     fun destroy() {
         // get all blocks in the modifiable area that need to be set to air
-        Cuboid.getAsync(
-            allowedArea.min.toLocation(ZTD.world),
-            allowedArea.max.toLocation(ZTD.world),
-            true,
-            ZTD
-        ) { blocks ->
-            ZTD.logging.info("Gathered blocks in modifiable range, blocks = ${blocks.size}")
+        Cuboid.getAsync(allowedArea.min.toLocation(ZWorld.world), allowedArea.max.toLocation(ZWorld.world), true, ZTD.instance)
+
+        { blocks ->
+            ZTD.instance.logging.info("Gathered blocks in modifiable range, blocks = ${blocks.size}")
 
             val air = Material.AIR.createBlockData()
 
-            Cuboid.set(blocks.associateWith { air }, ZTD) {
+            Cuboid.set(blocks.associateWith { air }, ZTD.instance) {
 
-                ZTD.logging.info("Finished map block reset")
+                ZTD.instance.logging.info("Finished map block reset")
 
                 Divider.remove(this)
             }
@@ -262,7 +258,7 @@ class Session {
     fun start() {
         start = Instant.now()
 
-        task = Task.create(ZTD)
+        task = Task.create(ZTD.instance)
             .repeat(1)
             .execute(object : BukkitRunnable() {
                 override fun run() {
@@ -304,16 +300,21 @@ class Session {
 
             players.values.forEach { player ->
                 player.coins += 300
-                player.player.sendTitle(" ", Strings.colour("<gradient:#6050E8:#C250E8><bold>Round $round"), 5, 10, 5) }
+                player.player.sendTitle(" ", Strings.colour("<gradient:#6050E8:#C250E8><bold>Round $round"), 5, 10, 5)
+            }
         }
 
         if (sendQueueCounts.isNotEmpty()) {
             for ((type, count) in HashMap(sendQueueCounts)) {// todo replace with .forEach?
+
+                println(type)
+                println(count)
+
                 val interval = sendQueueInterval[type]!!
 
                 if (tick % interval != 0) continue
 
-                Troop2(type, getPath(), players.values.first())
+                Troop2(type, getPath(), players.values.random())
 
                 val newCount = count - 1
 
@@ -373,7 +374,7 @@ class Session {
 
             troop.tick()
 
-            val heading: Vector = troop.path.getHeading(troop, troop.getSpeed())
+            val heading = troop.path.getHeading(troop, troop.getSpeed())
 
             val location = entity.location.clone()
 
@@ -405,7 +406,7 @@ class Session {
         // todo cache
         fun getAvailableMaps(): List<String> {
             try {
-                Files.list(ZTD.getInFolder("maps").toPath())
+                Files.list(ZTD.instance.getInFolder("maps").toPath())
                     .use { maps ->
                         return maps
                             .map { p: Path ->
@@ -415,7 +416,7 @@ class Session {
                             .toList()
                     }
             } catch (ex: IOException) {
-                ZTD.logging.stack("Error while trying to find available maps", ex)
+                ZTD.instance.logging.stack("Error while trying to find available maps", ex)
                 return emptyList()
             }
         }

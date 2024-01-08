@@ -1,8 +1,7 @@
 name: ZTD
 version: 1.0.0
 main: dev.efnilite.ztd.ZTD
-api-version: 1.19
-depend: [vilib]
+api-version: 1.20
 commands:
   ztd:
     description: "yep."
