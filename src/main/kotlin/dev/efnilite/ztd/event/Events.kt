@@ -1,8 +1,8 @@
 package dev.efnilite.ztd.event
 
 import dev.efnilite.vilib.event.EventWatcher
-import dev.efnilite.ztd.TowerPlayer.Companion.asTowerPlayer
-import dev.efnilite.ztd.TowerPlayer.Companion.isTowerPlayer
+import dev.efnilite.ztd.asTowerPlayer
+import dev.efnilite.ztd.isTowerPlayer
 import dev.efnilite.ztd.menu.PlaceMenu
 import dev.efnilite.ztd.menu.TowerMenu
 import dev.efnilite.ztd.tower.Tower

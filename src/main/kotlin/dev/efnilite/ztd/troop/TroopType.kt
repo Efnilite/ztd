@@ -131,6 +131,7 @@ enum class TroopType(
 
     companion object {
 
+        // todo fix ugly
         private val troopToHealth: MutableMap<TroopType, Int> = EnumMap(TroopType::class.java)
         private val healthToTroop: MutableMap<Int, TroopType> = HashMap()
 

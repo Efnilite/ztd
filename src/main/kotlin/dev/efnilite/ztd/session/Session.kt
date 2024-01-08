@@ -5,10 +5,11 @@ import dev.efnilite.vilib.util.Cuboid
 import dev.efnilite.vilib.util.Strings
 import dev.efnilite.vilib.util.Task
 import dev.efnilite.ztd.TowerPlayer
-import dev.efnilite.ztd.TowerPlayer.Companion.isTowerPlayer
 import dev.efnilite.ztd.ZTD
+import dev.efnilite.ztd.isTowerPlayer
 import dev.efnilite.ztd.tower.Tower
 import dev.efnilite.ztd.tower.util.TroopList
+import dev.efnilite.ztd.troop.Path2
 import dev.efnilite.ztd.troop.Troop2
 import dev.efnilite.ztd.troop.TroopType
 import dev.efnilite.ztd.world.Divider
@@ -27,16 +28,15 @@ import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.file.Files
-import java.nio.file.Path
 import java.time.Instant
 import java.util.*
 import kotlin.math.max
 
-class Session {
+class Session(private val map: String) {
 
     private var tick: Int = 0
 
-    private var path: List<Location> = emptyList()
+    private var waypoints: List<Vector> = emptyList()
     private var spawns: Map<Team, Location> = EnumMap(Team::class.java)
 
     private var sendQueueInterval: Map<TroopType, Int> = EnumMap(TroopType::class.java)
@@ -46,20 +46,71 @@ class Session {
     private val troops: MutableMap<UUID, Troop2> = HashMap()
     private val players: MutableMap<UUID, TowerPlayer> = HashMap()
     private val health: MutableMap<Team, Int> = EnumMap(Team::class.java)
+    private lateinit var allowedArea: BoundingBox
 
     lateinit var start: Instant
         private set
 
     private lateinit var task: BukkitTask
 
-    private lateinit var allowedArea: BoundingBox
     private var inLobby = true
     var round = 0
         private set
 
-    fun getHealth(team: Team) = health.getOrDefault(team, 150)
+    private fun construct(onComplete: (Session) -> Unit) {
+        val schematic = Schematics.getSchematic(ZTD.instance, "$map.schematic")
 
-    fun getPath() = dev.efnilite.ztd.troop.Path(path)
+        ZTD.instance.logging.info("Constructing game map, map = $map")
+
+        // offset center by half the dimensions of the schematic to
+        // paste the schematic in the center.
+        val center = Divider.toLocation(this)
+        val minSchematic = center.clone().subtract(schematic.dimensions.multiply(0.5))
+
+        ZTD.instance.logging.info("Pasting game map schematic, map = $map")
+        schematic.paste(minSchematic)
+
+        val halfDimensions: Vector = schematic.dimensions.clone().multiply(0.75)
+        val minMap: Location = center.clone().subtract(halfDimensions)
+        val maxMap: Location = center.clone().add(halfDimensions)
+
+        allowedArea = BoundingBox.of(minMap, maxMap)
+
+        // todo cache
+        Task.create(ZTD.instance)
+            .async()
+            .execute {
+                // map data handling
+                ZTD.instance.logging.info("Reading game map data, map = $map")
+
+                BukkitObjectInputStream(BufferedInputStream(FileInputStream(ZTD.instance.getInFolder("maps/$map.map")))).use { stream ->
+                    ZTD.instance.logging.info("Deserializing map data, map = $map")
+
+                    waypoints = (stream.readObject() as MutableList<Vector>)
+                        .map { vector ->
+                            vector.clone()
+                                .add(minSchematic.toVector())
+                                .add(Vector(0.5, 0.0, 0.5))
+                        }
+                        .toList()
+
+                    spawns = (stream.readObject() as MutableMap<Team, Vector>)
+                        .map { (team, vector) ->
+                            team to vector.clone().toLocation(ZWorld.world)
+                                .add(minSchematic)
+                                .add(0.5, 0.0, 0.5)
+                        }
+                        .toMap()
+                }
+
+                // go to main thread
+//                Task.create(ZTD.instance).execute { onComplete.invoke(this) }.run()
+                onComplete.invoke(this)
+            }
+            .run()
+    }
+
+    fun getHealth(team: Team) = health.getOrDefault(team, 150)
 
     fun addTower(tower: Tower) {
         towers.add(tower)
@@ -76,11 +127,8 @@ class Session {
     }
 
     fun getTroop(uuid: UUID): Troop2? = troops[uuid]
-    fun getTroops(): Collection<Troop2> = troops.values
 
     fun getPlayer(uuid: UUID): TowerPlayer? = players[uuid]
-
-    fun getPlayers(): Collection<TowerPlayer> = players.values
 
     fun damageTeam(team: Team, damage: Int) {
         val newHealth = max(0, health.getOrDefault(team, 150) - damage)
@@ -183,60 +231,6 @@ class Session {
         towers.clear()
     }
 
-    fun construct(map: String, onComplete: Runnable) {
-        Divider.add(this)
-
-        val schematic = Schematics.getSchematic(ZTD.instance, "$map.schematic")
-
-        ZTD.instance.logging.info("Constructing game map, map = $map")
-
-        // offset center by half the dimensions of the schematic to
-        // paste the schematic in the center.
-        val center = Divider.toLocation(this)
-        val minSchematic = center.clone().subtract(schematic.dimensions.multiply(0.5))
-
-        ZTD.instance.logging.info("Pasting game map schematic, map = $map")
-        schematic.paste(minSchematic)
-
-        val halfDimensions: Vector = schematic.dimensions.clone().multiply(0.75)
-        val minMap: Location = center.clone().subtract(halfDimensions)
-        val maxMap: Location = center.clone().add(halfDimensions)
-
-        allowedArea = BoundingBox.of(minMap, maxMap)
-
-        // todo cache
-        Task.create(ZTD.instance)
-            .async()
-            .execute {
-                // map data handling
-                ZTD.instance.logging.info("Reading game map data, map = $map")
-
-                BukkitObjectInputStream(BufferedInputStream(FileInputStream(ZTD.instance.getInFolder("maps/$map.map")))).use { stream ->
-                    ZTD.instance.logging.info("Deserializing map data, map = $map")
-
-                    path = (stream.readObject() as MutableList<Vector>)
-                        .map { vector ->
-                            vector.clone().toLocation(ZWorld.world)
-                                .add(minSchematic)
-                                .add(0.5, 0.0, 0.5)
-                        }
-                        .toList()
-
-                    spawns = (stream.readObject() as MutableMap<Team, Vector>)
-                        .map { (team, vector) ->
-                            team to vector.clone().toLocation(ZWorld.world)
-                                .add(minSchematic)
-                                .add(0.5, 0.0, 0.5)
-                        }
-                        .toMap()
-                }
-
-                // go to main thread
-                Task.create(ZTD.instance).execute { onComplete.run() }.run()
-            }
-            .run()
-    }
-
     fun destroy() {
         // get all blocks in the modifiable area that need to be set to air
         Cuboid.getAsync(allowedArea.min.toLocation(ZWorld.world), allowedArea.max.toLocation(ZWorld.world), true, ZTD.instance)
@@ -314,7 +308,7 @@ class Session {
 
                 if (tick % interval != 0) continue
 
-                Troop2(type, getPath(), players.values.random())
+                Troop2(type, Path2(waypoints, type.speed), players.values.random())
 
                 val newCount = count - 1
 
@@ -374,20 +368,19 @@ class Session {
 
             troop.tick()
 
-            val heading = troop.path.getHeading(troop, troop.getSpeed())
+            if (troop.path.points.size <= troop.index) {
+                continue
+            }
 
-            val location = entity.location.clone()
+            entity.teleport(troop.path.points[troop.index].toLocation(ZWorld.world))
 
-            location.pitch = 0F
+            troop.index++
 
-            entity.teleport(if (heading.isFinite()) location.add(heading) else location)
             troop.snapToGround()
         }
     }
 
     companion object {
-
-        fun Vector.isFinite(): Boolean = x.isFinite() && y.isFinite() && z.isFinite()
 
         /**
          * Creates a new builder.
@@ -395,10 +388,13 @@ class Session {
          * @return A new builder instance.
          */
         fun create(player: Player, map: String): Session {
-            val session = Session()
-
             player.sendMessage(Strings.colour("<gray>Creating map..."))
-            session.construct(map) { session.join(player) }
+
+            val session = Session(map)
+
+            Divider.add(session)
+
+            session.construct { it.join(player) }
 
             return session
         }
@@ -409,7 +405,7 @@ class Session {
                 Files.list(ZTD.instance.getInFolder("maps").toPath())
                     .use { maps ->
                         return maps
-                            .map { p: Path ->
+                            .map { p ->
                                 p.toFile().name.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
                             }
                             .distinct()

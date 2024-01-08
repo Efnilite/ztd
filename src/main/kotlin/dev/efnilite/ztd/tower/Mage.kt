@@ -18,12 +18,14 @@ class Mage(center: Location, blocks: Set<Block>, owner: dev.efnilite.ztd.TowerPl
     override fun construct() {
         super.construct()
 
-        fireLength = getSpecial("fire_length") as Int
-        damageBonus = getSpecial("damage_bonus") as Int
-        targetCount = getSpecial("target_count") as Int
+        update()
     }
 
     override fun upgrade() {
+        update()
+    }
+
+    private fun update() {
         fireLength = getSpecial("fire_length") as Int
         damageBonus = getSpecial("damage_bonus") as Int
         targetCount = getSpecial("target_count") as Int

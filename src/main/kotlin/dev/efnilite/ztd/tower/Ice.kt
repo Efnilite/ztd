@@ -22,10 +22,14 @@ class Ice(center: Location, blocks: Set<Block>, owner: TowerPlayer, config: Conf
     override fun construct() {
         super.construct()
 
-        freezeTime = getSpecial("freeze_time") as Int
+        update()
     }
 
     override fun upgrade() {
+        update()
+    }
+
+    private fun update() {
         freezeTime = getSpecial("freeze_time") as Int
     }
 

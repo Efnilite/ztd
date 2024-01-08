@@ -15,25 +15,26 @@ import java.util.*
 import kotlin.math.max
 
 private data class PersistentTroopData(
-    val location: Location,
+    val index: Int,
     val fireTicks: Int = 0,
     val activePotionEffects: Collection<PotionEffect> = emptySet()
 )
 
+// todo fix ugly
 /**
  * Represents any troop. Iteration 2.
  */
 class Troop2 private constructor(
     val type: TroopType,
-    val path: Path,
+    val path: Path2,
     val owner: TowerPlayer,
     data: PersistentTroopData
 ) {
 
-    constructor(type: TroopType, path: Path, owner: TowerPlayer) : this(type, path, owner, PersistentTroopData(path.getTarget()))
+    constructor(type: TroopType, path: Path2, owner: TowerPlayer) : this(type, path, owner, PersistentTroopData(0))
 
     var health = type.health
-    val entity: LivingEntity = ZWorld.world.spawnEntity(data.location, type.type) as LivingEntity
+    val entity: LivingEntity = ZWorld.world.spawnEntity(path.points[0].toLocation(ZWorld.world), type.type) as LivingEntity
 
     val world: World
         get() = entity.world
@@ -43,6 +44,8 @@ class Troop2 private constructor(
         get() = entity.uniqueId
     val session: Session
         get() = owner.session
+
+    var index = 0
 
     init {
         entity.setAI(false)
@@ -94,9 +97,9 @@ class Troop2 private constructor(
                 repeat(amount) {
                     Troop2(
                         type,
-                        path.clone(),
+                        Path2(path.waypoints, type.speed),
                         owner,
-                        PersistentTroopData(location, entity.fireTicks, entity.activePotionEffects)
+                        PersistentTroopData(index, entity.fireTicks, entity.activePotionEffects)
                     )
                 }
             }

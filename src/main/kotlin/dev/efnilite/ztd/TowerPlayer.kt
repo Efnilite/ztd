@@ -14,6 +14,16 @@ import org.bukkit.util.Vector
 import java.time.Duration
 import java.time.Instant
 
+private fun Player.getSession(): Session? = Divider.sessions
+    .firstOrNull { session -> session.getPlayer(uniqueId) != null }
+
+fun Player.asTowerPlayer(): TowerPlayer? {
+    val session = getSession() ?: return null
+    return session.getPlayer(uniqueId)
+}
+
+fun Player.isTowerPlayer() = asTowerPlayer() != null
+
 class TowerPlayer(val player: Player) {
 
     val name = player.name
@@ -23,9 +33,7 @@ class TowerPlayer(val player: Player) {
     val location
         get() = player.location
 
-    val session
-        get() = Divider.sessions
-            .first { session -> session.getPlayer(player.uniqueId) != null }
+    val session = Divider.sessions.first { session -> session.getPlayer(player.uniqueId) != null }
 
     var coins = 0
     var team = Team.SINGLE
@@ -53,13 +61,13 @@ class TowerPlayer(val player: Player) {
      * @return The formatted time.
      */
     private fun timeFromMillis(millis: Int): String {
-        var millis = millis
+        var ms = millis
 
-        val h = millis / (3600 * 1000)
-        millis -= h * 3600 * 1000
-        val m = millis / (60 * 1000)
-        millis -= m * 60 * 1000
-        val s = millis / 1000
+        val h = ms / (3600 * 1000)
+        ms -= h * 3600 * 1000
+        val m = ms / (60 * 1000)
+        ms -= m * 60 * 1000
+        val s = ms / 1000
         return (if (h > 0) "$h:" else "" +
                 "${padLeft(m.toString(), if (m < 10) 1 else 0)}:" +
                 padLeft(s.toString(), if (s < 10) 1 else 0))
@@ -99,17 +107,4 @@ class TowerPlayer(val player: Player) {
     fun send(message: String) {
         player.sendMessage(Strings.colour(message))
     }
-
-    companion object {
-        private fun Player.getSession(): Session? = Divider.sessions
-            .firstOrNull { session -> session.getPlayer(uniqueId) != null }
-
-        fun Player.asTowerPlayer(): TowerPlayer? {
-            val session = getSession() ?: return null
-            return session.getPlayer(uniqueId)
-        }
-
-        fun Player.isTowerPlayer() = asTowerPlayer() != null
-    }
-
 }

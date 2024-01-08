@@ -1,7 +1,7 @@
 package dev.efnilite.ztd.command
 
 import dev.efnilite.vilib.command.ViCommand
-import dev.efnilite.ztd.TowerPlayer.Companion.asTowerPlayer
+import dev.efnilite.ztd.asTowerPlayer
 import dev.efnilite.ztd.menu.PlayMenu
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player

@@ -22,12 +22,14 @@ class Archer(center: Location, blocks: Set<Block>, owner: TowerPlayer, config: C
     override fun construct() {
         super.construct()
 
-        distanceDamage = getSpecial("distance_damage") as Int
-        arrowCount = getSpecial("arrow_count") as Int
-        shootLocation = getTop().add(0.0, 2.0, 0.0)
+        update()
     }
 
     override fun upgrade() {
+        update()
+    }
+
+    private fun update() {
         distanceDamage = getSpecial("distance_damage") as Int
         arrowCount = getSpecial("arrow_count") as Int
         shootLocation = getTop().add(0.0, 2.0, 0.0)
