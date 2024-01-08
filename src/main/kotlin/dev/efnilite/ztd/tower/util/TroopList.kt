@@ -5,13 +5,11 @@ import java.util.concurrent.ThreadLocalRandom
 
 data class TroopList(val troops: List<Troop2>) : Iterable<Troop2> {
 
-    fun isEmpty(): Boolean = troops.isEmpty()
+    fun isEmpty() = troops.isEmpty()
 
-    fun get(idx: Int): Troop2 =
+    fun get(idx: Int) =
         if (idx < troops.size) troops[idx]
         else troops[ThreadLocalRandom.current().nextInt(troops.size)]
 
-    override fun iterator(): Iterator<Troop2> {
-        return troops.iterator()
-    }
+    override fun iterator(): Iterator<Troop2> = troops.iterator()
 }

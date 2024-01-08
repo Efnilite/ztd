@@ -11,7 +11,7 @@ import dev.efnilite.ztd.tower.Tower
 import dev.efnilite.ztd.tower.util.TroopList
 import dev.efnilite.ztd.troop.Troop2
 import dev.efnilite.ztd.troop.TroopType
-import dev.efnilite.ztd.world.WorldDivider
+import dev.efnilite.ztd.world.Divider
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -187,7 +187,7 @@ class Session(val uuid: UUID) {
     }
 
     fun construct(map: String, onComplete: Runnable) {
-        WorldDivider.associate(this)
+        Divider.add(this)
         mapData.name = map
         mapData.schematic = Schematics.getSchematic(ZTD.instance, "$map.schematic")
 
@@ -195,7 +195,7 @@ class Session(val uuid: UUID) {
 
         // offset center by half the dimensions of the schematic to
         // paste the schematic in the center.
-        val center = WorldDivider.toLocation(this)
+        val center = Divider.toLocation(this)
         val minSchematic: Location = center.clone().subtract(mapData.schematic.dimensions.multiply(0.5))
 
         ZTD.logging.info("Pasting game map schematic, map = $map")
@@ -253,8 +253,7 @@ class Session(val uuid: UUID) {
 
                 ZTD.logging.info("Finished map block reset")
 
-                WorldDivider.disassociate(this)
-
+                Divider.remove(this)
             }
         }
     }

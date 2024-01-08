@@ -19,7 +19,7 @@ class Path(pos: List<Location>) {
      * Returns the current target. If [troop] is close enough to the current target,
      * the target will be updated.
      */
-    fun getTarget(troop: Troop2): Location {
+    private fun getTarget(troop: Troop2): Location {
         val target: Location = positions.peek()
 
         val nullifiedY: Location = troop.location.clone()
@@ -27,7 +27,7 @@ class Path(pos: List<Location>) {
 
         // todo cache locations
 
-        if (distanceThreshold * distanceThreshold > target.distanceSquared(nullifiedY)) {
+        if (DISTANCE_THRESHOLD * DISTANCE_THRESHOLD > target.distanceSquared(nullifiedY)) {
             if (positions.size > 1) {
                 return positions.poll()
             }
@@ -56,6 +56,6 @@ class Path(pos: List<Location>) {
 
 
     companion object {
-        private const val distanceThreshold = 0.3
+        private const val DISTANCE_THRESHOLD = 0.3
     }
 }

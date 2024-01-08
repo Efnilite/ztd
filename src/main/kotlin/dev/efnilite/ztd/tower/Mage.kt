@@ -11,9 +11,9 @@ class Mage(center: Location, blocks: Set<Block>, owner: dev.efnilite.ztd.TowerPl
     config
 ) {
 
-    private var fireLength: Int = 20
-    private var damageBonus: Int = 0
-    private var targetCount: Int = 1
+    private var fireLength = 20
+    private var damageBonus = 0
+    private var targetCount = 1
 
     override fun construct() {
         super.construct()

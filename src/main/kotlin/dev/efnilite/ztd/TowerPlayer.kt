@@ -4,7 +4,7 @@ import dev.efnilite.vilib.lib.fastboard.fastboard.FastBoard
 import dev.efnilite.vilib.util.Strings
 import dev.efnilite.ztd.session.Session
 import dev.efnilite.ztd.session.Team
-import dev.efnilite.ztd.world.WorldDivider
+import dev.efnilite.ztd.world.Divider
 import org.bukkit.GameMode
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -24,7 +24,7 @@ class TowerPlayer(val player: Player) {
         get() = player.location
 
     val session
-        get() = WorldDivider.getSessions()
+        get() = Divider.sessions
             .first { session -> session.getPlayer(player.uniqueId) != null }
 
     var coins = 0
@@ -101,7 +101,7 @@ class TowerPlayer(val player: Player) {
     }
 
     companion object {
-        fun Player.getSession(): Session? = WorldDivider.getSessions()
+        private fun Player.getSession(): Session? = Divider.sessions
             .firstOrNull { session -> session.getPlayer(uniqueId) != null }
 
         fun Player.asTowerPlayer(): TowerPlayer? {

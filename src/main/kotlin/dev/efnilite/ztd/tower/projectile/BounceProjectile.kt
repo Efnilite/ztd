@@ -8,6 +8,6 @@ open class BounceProjectile(
     val bounceCount: Int, val bounceRadius: Double,
 ) : Projectile(target, owner, speed, damage) {
 
-    open fun getNewInstance(newTarget: Troop2): BounceProjectile = this
+    open fun getNewInstance(newTarget: Troop2) = this
 
 }

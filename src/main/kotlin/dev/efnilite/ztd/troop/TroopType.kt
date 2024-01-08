@@ -151,6 +151,5 @@ enum class TroopType(
             val values = values()
             return values[values.indexOf(type) + 1]
         }
-
     }
 }

@@ -7,7 +7,7 @@ class IncrementalBounceProjectile(
     target: Troop2, owner: Tower, speed: Double, damage: Int, bounceCount: Int, bounceRadius: Double
 ) : BounceProjectile(target, owner, speed, damage, bounceCount, bounceRadius) {
 
-    override fun getNewInstance(newTarget: Troop2): BounceProjectile =
+    override fun getNewInstance(newTarget: Troop2) =
         IncrementalBounceProjectile(
             newTarget,
             owner,

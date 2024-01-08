@@ -4,7 +4,10 @@ import dev.efnilite.vilib.particle.ParticleData
 import dev.efnilite.vilib.particle.Particles
 import dev.efnilite.vilib.schematic.Schematics
 import dev.efnilite.vilib.util.Cuboid
+import dev.efnilite.ztd.Config
+import dev.efnilite.ztd.TowerPlayer
 import dev.efnilite.ztd.tower.util.TroopList
+import dev.efnilite.ztd.troop.Troop2
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
@@ -12,7 +15,7 @@ import org.bukkit.block.Block
 import org.bukkit.util.BoundingBox
 import kotlin.math.roundToInt
 
-abstract class Tower(private val center: Location, val blocks: Set<Block>, val owner: dev.efnilite.ztd.TowerPlayer, val config: dev.efnilite.ztd.Config) {
+abstract class Tower(private val center: Location, val blocks: Set<Block>, val owner: TowerPlayer, val config: Config) {
 
     private var shootingDamage: Int = getShootingDamage(0, 0)
     private var shootingRange: Double = getShootingRange(0, 0)
@@ -50,6 +53,9 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
 
     fun getSpecial(finalPath: String): Any? = getPath(finalPath, path, level)
 
+    fun getSpecialAsInt(finalPath: String): Int = getSpecial(finalPath) as Int
+    fun getSpecialAsDouble(finalPath: String): Double = getSpecial(finalPath) as Double
+
     /**
      * Returns the top block of the current schematic. Result should be cached.
      */
@@ -77,10 +83,15 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
      */
     fun getShootingRate(path: Int, level: Int): Int = getPath("rate", path, level)
 
-    fun getSpecialValues(path: Int, level: Int): Map<String, Any> =
-        (if (path == 0) config.getChildren("paths.0") else config.getChildren("paths.$path.$level"))
+    fun getSpecialValues(path: Int, level: Int): Map<String, Any> {
+        return (if (path == 0) {
+            config.getChildren("paths.0")
+        } else {
+            config.getChildren("paths.$path.$level")
+        })
             .filter { p -> p != "cost" && p != "damage" && p != "range" && p != "rate" }
             .associateWith { v -> if (path == 0) config.get("paths.0.$v") else config.get("paths.$path.$level.$v") }
+    }
 
     private fun <T> getPath(subpath: String, path: Int, level: Int): T =
         if (path == 0) config.get("paths.0.$subpath") as T else config.get("paths.$path.$level.$subpath") as T
@@ -115,7 +126,7 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
                 .reduce { one: Int, two: Int -> one + two }
         }
 
-        return (Tower.Companion.sellFraction * cost).toInt()
+        return (SELL_FRACTION * cost).toInt()
     }
 
     fun showRange() {
@@ -133,9 +144,9 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
 
     companion object {
 
-        const val sellFraction = 0.7
+        private const val SELL_FRACTION = 0.7
 
-        fun place(player: dev.efnilite.ztd.TowerPlayer, block: Block, type: (Location, Set<Block>, dev.efnilite.ztd.TowerPlayer) -> Tower) {
+        fun place(player: TowerPlayer, block: Block, type: (Location, Set<Block>, TowerPlayer) -> Tower) {
             val location = block.location.toCenterLocation()
 
             val foundationMin = location.clone().subtract(1.0, 1.0, 1.0)
@@ -179,4 +190,13 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
             }
         }
     }
+}
+
+enum class TargetMode(val sort: (List<Troop2>) -> List<Troop2>) {
+
+    FIRST({ list -> list }),
+    LAST({ list -> list.reversed() }),
+    STRONG({ list -> list.sortedBy { troop -> troop.health }}),
+    WEAK({ list -> list.sortedBy { troop -> troop.health }.reversed() });
+
 }
