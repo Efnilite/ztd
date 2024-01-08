@@ -8,19 +8,17 @@ import dev.efnilite.ztd.command.MapCommand
 import dev.efnilite.ztd.command.ZTDCommand
 import dev.efnilite.ztd.event.Events
 import dev.efnilite.ztd.world.WorldHandler
-import org.bukkit.World
 import java.io.File
 import java.nio.file.Files
 import kotlin.io.path.name
 
-class ZTD : ViPlugin() {
+object ZTD : ViPlugin() {
+
+    val logging = Logging(this)
+    private val handler = WorldHandler()
+    val world = handler.world
 
     override fun enable() {
-        instance = this
-        logging = Logging(this)
-        handler = WorldHandler()
-        world = handler.world
-
         saveResource("maps/training.map", false)
         saveResource("maps/training.schematic", false)
 
@@ -41,7 +39,7 @@ class ZTD : ViPlugin() {
 
     private fun registerSchematics(folder: String) {
         Files.list(getInFolder(folder).toPath()).use { paths ->
-            paths.filter { path -> path.name.split("\\.".toRegex())[1].lowercase() == "schematic" }
+            paths.filter { path -> path.name.endsWith(".schematic") }
                 .forEach { path ->
                     Schematics.addFromFiles(this, path.toFile()) }
         }
@@ -54,15 +52,5 @@ class ZTD : ViPlugin() {
 
     override fun getElevator(): GitElevator? = null
 
-    companion object {
-        lateinit var world: World
-        lateinit var instance: ZTD
-            private set
-        lateinit var logging: Logging
-            private set
-        lateinit var handler: WorldHandler
-            private set
-
-        fun getInFolder(file: String) = File(instance.dataFolder, file)
-    }
+    fun getInFolder(file: String) = File(dataFolder, file)
 }

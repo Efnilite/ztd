@@ -35,7 +35,7 @@ class Mage(center: Location, blocks: Set<Block>, owner: dev.efnilite.ztd.TowerPl
 
             target.entity.fireTicks = fireLength
             target.entity.setMetadata("ztd fire", FixedMetadataValue(
-                ZTD.instance,
+                ZTD,
                 FireData(this, getDamage(), damageBonus)
             ))
         }

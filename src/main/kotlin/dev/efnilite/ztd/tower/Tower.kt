@@ -6,6 +6,7 @@ import dev.efnilite.vilib.schematic.Schematics
 import dev.efnilite.vilib.util.Cuboid
 import dev.efnilite.ztd.Config
 import dev.efnilite.ztd.TowerPlayer
+import dev.efnilite.ztd.ZTD
 import dev.efnilite.ztd.tower.util.TroopList
 import dev.efnilite.ztd.troop.Troop2
 import org.bukkit.Location
@@ -52,9 +53,6 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
     abstract fun getName(): String
 
     fun getSpecial(finalPath: String): Any? = getPath(finalPath, path, level)
-
-    fun getSpecialAsInt(finalPath: String): Int = getSpecial(finalPath) as Int
-    fun getSpecialAsDouble(finalPath: String): Double = getSpecial(finalPath) as Double
 
     /**
      * Returns the top block of the current schematic. Result should be cached.
@@ -110,7 +108,7 @@ abstract class Tower(private val center: Location, val blocks: Set<Block>, val o
     open fun construct() {
         destroyBlocks()
 
-        val schematic = Schematics.getSchematic(dev.efnilite.ztd.ZTD.instance, "${getName()}-$level.schematic")
+        val schematic = Schematics.getSchematic(ZTD, "${getName()}-$level.schematic")
         schematic.paste(center.clone().subtract(1.0, 0.0, 1.0))
     }
 

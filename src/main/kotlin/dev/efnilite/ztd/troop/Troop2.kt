@@ -72,7 +72,7 @@ class Troop2(val type: TroopType, val path: Path, val owner: TowerPlayer, data: 
                     type
                 ) - damage
             ) ?: return
-            val next = TroopType.Companion.getNext(newType)
+            val next = TroopType.getNext(newType)
 
             var totalSpawned = 0
             for ((amount, type) in next.onDeath.invoke()) {

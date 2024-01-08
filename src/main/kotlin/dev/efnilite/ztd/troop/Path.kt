@@ -7,11 +7,7 @@ import java.util.*
 
 class Path(pos: List<Location>) {
 
-    private val positions: Queue<Location> = LinkedList()
-
-    init {
-        positions.addAll(pos)
-    }
+    private val positions: Queue<Location> = LinkedList(pos)
 
     fun getTarget(): Location = positions.peek()
 
@@ -20,9 +16,9 @@ class Path(pos: List<Location>) {
      * the target will be updated.
      */
     private fun getTarget(troop: Troop2): Location {
-        val target: Location = positions.peek()
+        val target = positions.peek()
 
-        val nullifiedY: Location = troop.location.clone()
+        val nullifiedY = troop.location.clone()
         nullifiedY.y = target.y
 
         // todo cache locations
@@ -53,7 +49,6 @@ class Path(pos: List<Location>) {
         .multiply(speed)
 
     fun clone() = Path(positions.toList())
-
 
     companion object {
         private const val DISTANCE_THRESHOLD = 0.3

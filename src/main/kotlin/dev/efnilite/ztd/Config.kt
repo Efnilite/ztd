@@ -1,6 +1,6 @@
 package dev.efnilite.ztd
 
-import dev.efnilite.vilib.lib.configupdater.configupdater.ConfigUpdater
+import dev.efnilite.vilib.configupdater.ConfigUpdater
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
@@ -55,7 +55,7 @@ enum class Config(
     /**
      * Updates the file so all keys are present.
      */
-    fun update() {
+    private fun update() {
         try {
             ConfigUpdater.update(ZTD.instance, fileName, path, ignoredSections)
         } catch (ex: Exception) {
@@ -67,7 +67,7 @@ enum class Config(
      * @param path The path.
      * @return True when path exists, false if not.
      */
-    fun isPath(path: String): Boolean {
+    private fun isPath(path: String): Boolean {
         return fileConfiguration.isSet(path)
     }
 
@@ -164,7 +164,7 @@ enum class Config(
          * Reloads all config files.
          */
         fun reload() {
-            values().forEach(dev.efnilite.ztd.Config::load)
+            values().forEach(Config::load)
 
             ZTD.logging.info("Loaded all config files")
         }

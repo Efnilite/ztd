@@ -1,6 +1,6 @@
 package dev.efnilite.ztd
 
-import dev.efnilite.vilib.lib.fastboard.fastboard.FastBoard
+import dev.efnilite.vilib.fastboard.FastBoard
 import dev.efnilite.vilib.util.Strings
 import dev.efnilite.ztd.session.Session
 import dev.efnilite.ztd.session.Team

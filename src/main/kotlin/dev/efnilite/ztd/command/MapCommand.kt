@@ -5,7 +5,6 @@ import dev.efnilite.vilib.schematic.Schematic
 import dev.efnilite.vilib.util.Cuboid
 import dev.efnilite.vilib.util.Locations
 import dev.efnilite.ztd.ZTD
-import dev.efnilite.ztd.session.MapData
 import dev.efnilite.ztd.session.Team
 import org.bukkit.Location
 import org.bukkit.World
@@ -18,6 +17,13 @@ import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.*
 
+private data class MapContainer(
+    val name: String,
+    val path: List<Vector>,
+    val spawns: Map<Team, Vector>,
+    val min: Location
+)
+
 object MapCommand : ViCommand() {
 
     private val ids: MutableMap<String, MapContainer> = HashMap()
@@ -26,120 +32,129 @@ object MapCommand : ViCommand() {
         if (!sender.isOp || sender !is Player) {
             return false
         }
+
         when (args.size) {
-            2 -> {
-                when (args[0].lowercase()) {
-                    "create" -> {
-                        ids[args[1].lowercase()] =
-                            MapContainer(
-                                MapData(),
-                                null
-                            )
-
-                        sender.sendMessage("Created map ${args[1].lowercase()}")
-                    }
-
-                    "export" -> {
-                        val container = ids[args[1].lowercase()]!!
-                        try {
-                            BukkitObjectOutputStream(BufferedOutputStream(FileOutputStream(ZTD.getInFolder("maps/${args[1]}.map")))).use { writer ->
-                                writer.writeObject(container.data.path)
-                                writer.writeObject(container.data.spawns)
-                                writer.flush()
-                                sender.sendMessage("Exported file successfully.")
-                            }
-                        } catch (ex: Exception) {
-                            sender.sendMessage("Error while trying to export file, check your arguments.")
-                            ex.printStackTrace()
-                        }
-                    }
-
-                    "add-path" -> {
-                        val container = ids[args[1].lowercase()]
-                        val map: MapData = container!!.data
-                        val existing: MutableList<Vector> = map.path
-
-                        existing.add(sender.location.toBlockLocation().subtract(container.min!!).toVector())
-
-                        map.path = existing
-
-                        sender.sendMessage(
-                            "Added path at ${
-                                sender.location.toBlockLocation().subtract(container.min!!).toVector()
-                            }"
-                        )
-                    }
-
-                    else -> {
-                        sendHelp(sender)
-                    }
-                }
-            }
-
-            3 -> {
-                when (args[0].lowercase()) {
-                    "add-spawn" -> {
-                        val container = ids[args[1].lowercase()]
-                        val map = container!!.data
-                        val team = Team.valueOf(args[2])
-
-                        map.spawns[team] = sender.location.toBlockLocation().subtract(container.min!!).toVector()
-                        sender.sendMessage("Added spawn for team ${team.name}")
-                    }
-                    "tower" -> {
-                        val vector1 = parse(args[1])
-                        val vector2 = parse(args[2])
-                        val world: World = sender.world
-
-                        Schematic.create().save(
-                            "${ZTD.instance.dataFolder}/schematics/${UUID.randomUUID()}.schematic",
-                            vector1.toLocation(world),
-                            vector2.toLocation(world)
-                        )
-                    }
-                }
-            }
-
-            4 -> {
-                if (args[0].lowercase() == "corners") {
-                    val container = ids[args[1].lowercase()]
-                    val vector1 = parse(args[2])
-                    val vector2 = parse(args[3])
-                    val world: World = sender.world
-
-                    Schematic.create().save(
-                        "${ZTD.instance.dataFolder}/maps/${args[1]}.schematic",
-                        vector1.toLocation(world),
-                        vector2.toLocation(world)
-                    )
-
-                    sender.sendMessage("Saving schematic from $vector1 to $vector2")
-
-                    Cuboid.getAsync(vector1.toLocation(world), vector2.toLocation(world), true) { blocks ->
-                        container!!.min = blocks
-                            .map(Block::getLocation)
-                            .reduce { pos1: Location, pos2: Location -> Locations.min(pos1, pos2) }
-
-                        sender.sendMessage("Set box from $vector1 to $vector2")
-                    }
-                }
-            }
-
+            2 -> args2(sender, args)
+            3 -> args3(sender, args)
+            4 -> args4(sender, args)
             else -> sendHelp(sender)
         }
         return true
+    }
+
+    private fun args2(player: Player, args: Array<String>) {
+        val map = args[1].lowercase()
+
+        when (args[0].lowercase()) {
+            "create" -> {
+                ids[map] = MapContainer("", emptyList(), emptyMap(), player.location)
+
+                player.sendMessage("Created map $map")
+            }
+
+            "export" -> {
+                val container = ids[args[1].lowercase()]!!
+
+                try {
+                    BukkitObjectOutputStream(BufferedOutputStream(FileOutputStream(ZTD.getInFolder("maps/$map.map")))).use { writer ->
+                        writer.writeObject(container.path)
+                        writer.writeObject(container.spawns)
+                        writer.flush()
+                        player.sendMessage("Exported file successfully.")
+                    }
+                } catch (ex: Exception) {
+                    player.sendMessage("Error while trying to export file, check your arguments.")
+                    ex.printStackTrace()
+                }
+            }
+
+            "add-path" -> {
+                val container = ids[map]!!
+                val existing = container.path.toMutableList()
+
+                existing.add(player.location.toBlockLocation().subtract(container.min!!).toVector())
+
+                ids[map] = MapContainer(container.name, existing, container.spawns, container.min)
+
+                player.sendMessage(
+                    "Added path at ${player.location.toBlockLocation().subtract(container.min).toVector()}"
+                )
+            }
+
+            else -> sendHelp(player)
+        }
+    }
+
+    private fun args3(player: Player, args: Array<String>) {
+        val map = args[1].lowercase()
+
+        when (args[0].lowercase()) {
+            "add-spawn" -> {
+                val container = ids[map]!!
+                val team = Team.valueOf(args[2].uppercase())
+                val spawns = container.spawns.toMutableMap()
+
+                spawns[team] = player.location.toBlockLocation().subtract(container.min).toVector()
+
+                ids[map] = MapContainer(container.name, container.path, spawns, container.min)
+
+                player.sendMessage("Added spawn for team ${team.name}")
+            }
+
+            "tower" -> {
+                val vector1 = parse(args[1])
+                val vector2 = parse(args[2])
+                val world = player.world
+
+                Schematic.create().save(
+                    "${ZTD.dataFolder}/schematics/${UUID.randomUUID()}.schematic",
+                    vector1.toLocation(world),
+                    vector2.toLocation(world),
+                    ZTD
+                )
+            }
+        }
+    }
+
+    private fun args4(player: Player, args: Array<String>) {
+        val map = args[1].lowercase()
+
+        if (args[0].lowercase() == "corners") {
+            val container = ids[map]!!
+            val vector1 = parse(args[2])
+            val vector2 = parse(args[3])
+            val world: World = player.world
+
+            Schematic.create().save(
+                "${ZTD.dataFolder}/maps/$map.schematic",
+                vector1.toLocation(world),
+                vector2.toLocation(world),
+                ZTD
+            )
+
+            player.sendMessage("Saving schematic from $vector1 to $vector2")
+
+            Cuboid.getAsync(vector1.toLocation(world), vector2.toLocation(world), true, ZTD) { blocks ->
+                ids[map] = MapContainer(container.name, container.path, container.spawns, blocks
+                    .map(Block::getLocation)
+                    .reduce { pos1: Location, pos2: Location -> Locations.min(pos1, pos2) })
+
+                player.sendMessage("Set box from $vector1 to $vector2")
+            }
+        }
     }
 
     override fun tabComplete(sender: CommandSender, args: Array<String>): List<String> {
         return emptyList()
     }
 
-    private data class MapContainer(val data: MapData, var min: Location?)
-
     private fun parse(string: String): Vector {
         val values = string.replace("[()]".toRegex(), "")
             .replace(",", " ")
-            .split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            .split(" ".toRegex())
+            .dropLastWhile { it.isEmpty() }
+            .toTypedArray()
+
         return Vector(values[0].toDouble(), values[1].toDouble(), values[2].toDouble())
     }
 

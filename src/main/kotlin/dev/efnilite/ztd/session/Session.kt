@@ -31,7 +31,7 @@ import java.time.Instant
 import java.util.*
 import kotlin.math.max
 
-class Session(val uuid: UUID) {
+class Session {
 
     private var tick: Int = 0
 
@@ -53,8 +53,8 @@ class Session(val uuid: UUID) {
 
     private lateinit var task: BukkitTask
 
-    protected lateinit var allowedArea: BoundingBox
-    protected var inLobby = true
+    private lateinit var allowedArea: BoundingBox
+    private var inLobby = true
     var round = 0
         private set
 
@@ -107,18 +107,18 @@ class Session(val uuid: UUID) {
         // show player to other players in game
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer()) {
-                op.showPlayer(ZTD.instance, pl)
+                op.showPlayer(ZTD, pl)
             } else {
-                op.hidePlayer(ZTD.instance, pl)
+                op.hidePlayer(ZTD, pl)
             }
         }
 
         // show other players to player in game
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer()) {
-                pl.showPlayer(ZTD.instance, op)
+                pl.showPlayer(ZTD, op)
             } else {
-                pl.hidePlayer(ZTD.instance, op)
+                pl.hidePlayer(ZTD, op)
             }
         }
 
@@ -150,18 +150,18 @@ class Session(val uuid: UUID) {
         // show player who left to all other players who aren't in game
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer()) {
-                op.hidePlayer(ZTD.instance, pl)
+                op.hidePlayer(ZTD, pl)
             } else {
-                op.showPlayer(ZTD.instance, pl)
+                op.showPlayer(ZTD, pl)
             }
         }
 
         // show all other players who aren't in game to player
         for (op in Bukkit.getOnlinePlayers()) {
             if (op.isTowerPlayer() && op != pl) {
-                pl.hidePlayer(ZTD.instance, op)
+                pl.hidePlayer(ZTD, op)
             } else {
-                pl.showPlayer(ZTD.instance, op)
+                pl.showPlayer(ZTD, op)
             }
         }
 
@@ -189,7 +189,7 @@ class Session(val uuid: UUID) {
     fun construct(map: String, onComplete: Runnable) {
         Divider.add(this)
         mapData.name = map
-        mapData.schematic = Schematics.getSchematic(ZTD.instance, "$map.schematic")
+        mapData.schematic = Schematics.getSchematic(ZTD, "$map.schematic")
 
         ZTD.logging.info("Constructing game map, map = $map")
 
@@ -209,7 +209,7 @@ class Session(val uuid: UUID) {
         println("${minMap.toVector()} / ${maxMap.toVector()}")
 
         // todo cache
-        Task.create(ZTD.instance)
+        Task.create(ZTD)
             .async()
             .execute {
                 // map data handling
@@ -233,7 +233,7 @@ class Session(val uuid: UUID) {
                     .toMap()
 
                 // go to main thread
-                Task.create(ZTD.instance).execute { onComplete.run() }.run()
+                Task.create(ZTD).execute { onComplete.run() }.run()
             }
             .run()
     }
@@ -243,13 +243,14 @@ class Session(val uuid: UUID) {
         Cuboid.getAsync(
             allowedArea.min.toLocation(ZTD.world),
             allowedArea.max.toLocation(ZTD.world),
-            true
+            true,
+            ZTD
         ) { blocks ->
             ZTD.logging.info("Gathered blocks in modifiable range, blocks = ${blocks.size}")
 
             val air = Material.AIR.createBlockData()
 
-            Cuboid.set(blocks.associateWith { air }) {
+            Cuboid.set(blocks.associateWith { air }, ZTD) {
 
                 ZTD.logging.info("Finished map block reset")
 
@@ -261,7 +262,7 @@ class Session(val uuid: UUID) {
     fun start() {
         start = Instant.now()
 
-        task = Task.create(ZTD.instance)
+        task = Task.create(ZTD)
             .repeat(1)
             .execute(object : BukkitRunnable() {
                 override fun run() {
@@ -393,7 +394,7 @@ class Session(val uuid: UUID) {
          * @return A new builder instance.
          */
         fun create(player: Player, map: String): Session {
-            val session = Session(UUID.randomUUID())
+            val session = Session()
 
             player.sendMessage(Strings.colour("<gray>Creating map..."))
             session.construct(map) { session.join(player) }
